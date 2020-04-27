@@ -118,6 +118,7 @@ class DockerMode(LaunchMode):
             docker_prefix = 'nvidia-'+docker_prefix
         main_cmd = cmd_list.to_string()
         full_cmd = docker_prefix + ("\'%s\'" % main_cmd)
+
         return full_cmd
 
 
@@ -205,7 +206,7 @@ class SSHDocker(DockerMode):
             raise NotImplementedError()
         else:
             docker_cmd = self.get_docker_cmd(main_cmd, use_tty=False, extra_args=mnt_args, pythonpath=py_path)
-
+          
 
         remote_cmds.append(docker_cmd)
         remote_cmds.extend(remote_cleanup_commands)
@@ -461,8 +462,8 @@ class EC2SpotDocker(DockerMode):
             """)
             sio.write("echo 'Testing nvidia-smi'\n")
             sio.write("nvidia-smi\n")
-            sio.write("echo 'Testing nvidia-smi inside docker'\n")
-            sio.write("nvidia-docker run --rm {docker_image} nvidia-smi\n".format(docker_image=self.docker_image))
+            #sio.write("echo 'Testing nvidia-smi inside docker'\n")
+            #sio.write("nvidia-docker run --rm {docker_image} nvidia-smi\n".format(docker_image=self.docker_image))
 
         if self.checkpoint and self.checkpoint.restore:
             raise NotImplementedError()

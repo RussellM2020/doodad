@@ -13,12 +13,12 @@ use_gpu = False
 #envType = 'Push_mug' ; annotation = 'v4-mpl-50' ;  tasksFile = 'push_v4' ; max_path_length= 50 
 #envType = 'PickPlace' ; max_path_length = 50 ; tasksFile = 'push_v4' ; annotation = 'v4-mpl-50'
 #envType = 'Ant' ; max_path_length = 200 ; annotation = 'quat_v2' ; tasksFile = 'rad2_quat'
-#envType = 'Door' ; max_path_length = 100 ; annotation = 'deg60' ; tasksFile = 'door_60deg'
+#envType = 'Door' ; max_path_length = 100 ; annotation = 'deg60_handStart_4_1' ; tasksFile = 'door_60deg'
 #envType = 'Claw-screw' ; max_path_length = 50 ; tasksFile = 'door_60deg' ; annotation = 'quat-v1'
 #envType = 'pointMass' ; max_path_length = 100 ; tasksFile = 'door_60deg' ; annotation = 'trial'
 #envType = 'Sawyer-Push' ; max_path_length = 50 ; tasksFile = 'push_v4' ; annotation = 'repeat_April'
 
-envType = 'SawyerMultiDomain-Push-Door' ; max_path_length = 100 ; tasksFile = 'multi_domain/multiFamily_pushDoor_v1' ; annotation = 'pushDoor_v1'
+envType = 'SawyerMultiDomain-Push-Door-Drawer' ; max_path_length = 100 ; tasksFile = 'multi_domain/multiDomain_pushDoorDrawer_20each' ; annotation = 'pushDoorDrawer_20each'
 #envType = 'SawyerMultiPush' ; max_path_length = 50 ;  annotation = 'push_2Blocks_v1' ; tasksFile = 'multi_domain/push_2Blocks_v1'
 #
 
@@ -53,7 +53,7 @@ if use_gpu:
 else:
     mode_ec2 = dd.mode.EC2AutoconfigDocker(
             image= 'russellm888/railrl-gpu:latest' ,
-            region='us-west-1',  # EC2 region
+            region='us-west-2',  # EC2 region
             instance_type= 'c4.2xlarge',  # EC2 instance type
             spot_price=0.3,  # Maximum bid price
             s3_log_prefix = s3_log_prefix,
@@ -115,7 +115,7 @@ n_parallel = 1 ; rate = 0.01
 #expName = 'Claw-screw-trial' ; seed = 0
 
 
-policyType = 'basic' ; n_parallel =8 ; rate = 0.01 ; seed = 0 ; num_tasks = 6 ; batch_size = 20000
+policyType = 'basic' ; n_parallel =8 ; rate = 0.01 ; seed = 0 ; num_tasks = 30 ; batch_size = 20000
 
 #reset_arg = None
 if 'multiTask' in exp_mode:
@@ -141,18 +141,18 @@ if 'multiTask' in exp_mode:
 
 else:
     assert exp_mode == 'TRPO_individual_experts'
-    for reset_arg in range(num_tasks):
-    #reset_arg = 1
-        expName = 'Task_'+str(reset_arg)
-        dd.launch_python(
-            target=os.path.join(THIS_FILE_DIR, '/home/russell/maml_rl/launchers/trpo_launcher.py'),
-            #target=os.path.join(THIS_FILE_DIR, str(targetScript) ),  # point to a target script. If running remotely, this will be copied over
-            mode=MY_RUN_MODE,
-            mount_points=mounts,
-            args={
+    #for reset_arg in range(num_tasks):
+    reset_arg = 21
+    expName = 'Task_'+str(reset_arg)
+    dd.launch_python(
+        target=os.path.join(THIS_FILE_DIR, '/home/russell/maml_rl/launchers/trpo_launcher.py'),
+        #target=os.path.join(THIS_FILE_DIR, str(targetScript) ),  # point to a target script. If running remotely, this will be copied over
+        mode=MY_RUN_MODE,
+        mount_points=mounts,
+        args={
 
-                'variant' : {'seed' : seed, 'n_parallel' : n_parallel , 'log_dir': OUTPUT_DIR+expName+'/', 'envType' : envType , 'reset_arg' : reset_arg, 
-                'rate': rate,  'tasksFile' : tasksFile, 'max_path_length' : max_path_length , 'policyType':policyType , 'batch_size' : batch_size , 'num_tasks': num_tasks},           
-                'output_dir': OUTPUT_DIR
-            }
-        )
+            'variant' : {'seed' : seed, 'n_parallel' : n_parallel , 'log_dir': OUTPUT_DIR+expName+'/', 'envType' : envType , 'reset_arg' : reset_arg, 
+            'rate': rate,  'tasksFile' : tasksFile, 'max_path_length' : max_path_length , 'policyType':policyType , 'batch_size' : batch_size , 'num_tasks': num_tasks},           
+            'output_dir': OUTPUT_DIR
+        }
+    )

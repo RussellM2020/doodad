@@ -14,8 +14,6 @@ def launch_shell(
     if mount_points is None:
         mount_points = []
 
-    import ipdb
-    ipdb.set_trace()
     mode.launch_command(command, dry=dry, mount_points = mount_points)
 
 
@@ -77,8 +75,10 @@ def launch_python(
         fake_display=fake_display,
         use_cloudpickle=use_cloudpickle,
     )
+   
     mode.launch_command(command, mount_points=mount_points,
-                        **launch_command_kwargs)
+                       **launch_command_kwargs)
+
     return target_mount
 
 HEADLESS = 'xvfb-run -a -s "-ac -screen 0 1400x900x24 +extension RANDR"'
